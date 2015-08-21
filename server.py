@@ -23,8 +23,9 @@ This file is part of DHT-Mirror.
 """
 
 import zerorpc
+from blockstore.client import BlockstoreRPCClient
 
-from config import DEFAULT_URI, DEBUG
+from config import DEFAULT_URI, DEBUG, SERVER_IP, SERVER_PORT
 
 from pymongo import MongoClient
 db = MongoClient().get_default_database()
@@ -55,13 +56,39 @@ class DHTMirror(object):
             dht_mirror.insert(new_entry)
         else:
             entry['value'] = value
-            dht_mirror.save(entry)
+            dht_mirror.save()
 
         return True
 
     def stats(self, sentence):
         stats = {}
         return stats
+
+    def dht_get(key):
+
+        blockstored = BlockstoreRPCClient(SERVER_IP, SERVER_PORT)
+
+        resp = {}
+
+        try:
+            resp = blockstored.get(key)
+        except Exception as e:
+            resp['error'] = e
+
+        return resp
+
+    def dht_set(key, value):
+
+        blockstored = BlockstoreRPCClient(SERVER_IP, SERVER_PORT)
+
+        resp = {}
+
+        try:
+            resp = blockstored.set(key, value)
+        except Exception as e:
+            resp['error'] = e
+
+        return resp
 
 
 # ------------------------------
