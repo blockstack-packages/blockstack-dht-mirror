@@ -56,7 +56,7 @@ class DHTMirror(object):
             dht_mirror.insert(new_entry)
         else:
             entry['value'] = value
-            dht_mirror.save()
+            dht_mirror.save(entry)
 
         return True
 
