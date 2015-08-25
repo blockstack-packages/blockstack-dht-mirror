@@ -22,7 +22,12 @@ This file is part of DHT-Mirror.
 
 DEBUG = True
 
-DEFAULT_PORT = 5000
-DEFAULT_HOST = '0.0.0.0'
+DEFAULT_PORT = 5005
+DEFAULT_SERVER = '127.0.0.1'
 
-DEFAULT_URI = "tcp://" + DEFAULT_HOST + ":" + str(DEFAULT_PORT)
+DHT_SERVER_PORT = 6265  # blockstored default to port 6264
+
+DEFAULT_DHT_SERVERS = [('dht.openname.org', DHT_SERVER_PORT),
+                       ('dht.onename.com', DHT_SERVER_PORT),
+                       ('dht.halfmoonlabs.com', DHT_SERVER_PORT),
+                       ('127.0.0.1', DHT_SERVER_PORT)]

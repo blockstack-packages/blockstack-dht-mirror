@@ -22,20 +22,29 @@ This file is part of DHT-Mirror.
     along with DHT-Mirror. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import zerorpc
-from blockstore.client import BlockstoreRPCClient
-
-from config import DEFAULT_URI, DEBUG, SERVER_IP, SERVER_PORT
+from txjsonrpc.netstring import jsonrpc
 
 from pymongo import MongoClient
-db = MongoClient().get_default_database()
+db = MongoClient()
 dht_mirror = db.dht_mirror
 
 
-class DHTMirror(object):
+class DHTMirrorRPC(jsonrpc.JSONRPC):
     """ A DHT Mirror with faster get/set."""
 
-    def get(self, key):
+    def __init__(self, dht_server=None):
+        self.dht_server = dht_server
+
+    def jsonrpc_ping(self):
+        reply = {}
+        reply['status'] = "alive"
+        return reply
+
+    def jsonrpc_stats(self, sentence):
+        stats = {}
+        return stats
+
+    def jsonrpc_get(self, key):
 
         entry = dht_mirror.find_one({"key": key})
 
@@ -44,7 +53,7 @@ class DHTMirror(object):
         else:
             return None
 
-    def set(self, key, value):
+    def jsonrpc_set(self, key, value):
 
         new_entry = {}
         new_entry['key'] = key
@@ -60,46 +69,24 @@ class DHTMirror(object):
 
         return True
 
-    def stats(self, sentence):
-        stats = {}
-        return stats
-
-    def dht_get(key):
-
-        blockstored = BlockstoreRPCClient(SERVER_IP, SERVER_PORT)
+    def jsonrpc_dht_get(self, key):
 
         resp = {}
 
         try:
-            resp = blockstored.get(key)
+            resp = self.dht_server.get(key)
         except Exception as e:
             resp['error'] = e
 
         return resp
 
-    def dht_set(key, value):
-
-        blockstored = BlockstoreRPCClient(SERVER_IP, SERVER_PORT)
+    def jsonrpc_dht_set(self, key, value):
 
         resp = {}
 
         try:
-            resp = blockstored.set(key, value)
+            resp = self.dht_server.set(key, value)
         except Exception as e:
             resp['error'] = e
 
         return resp
-
-
-# ------------------------------
-def runserver():
-
-    s = zerorpc.Server(DHTMirror())
-    s.bind(DEFAULT_URI)
-    s.run()
-
-
-# ------------------------------
-if __name__ == '__main__':
-
-    runserver()

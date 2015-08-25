@@ -22,14 +22,21 @@ This file is part of DHT-Mirror.
     along with DHT-Mirror. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import zerorpc
+import jsonrpc_ns
+import json
 
-from config import DEFAULT_URI, DEBUG
+from config import DEFAULT_SERVER, DEFAULT_PORT, DEBUG
 
 
 # ------------------------------
 if __name__ == '__main__':
 
-    c = zerorpc.Client()
-    c.connect(DEFAULT_URI)
-    print c.stats("hello")
+    from jsonrpc_ns import JSONRPCProxy
+    jsonrpc = JSONRPCProxy(DEFAULT_SERVER, DEFAULT_PORT)
+    resp = jsonrpc.request('ping')
+    print resp
+
+    key = {"name": "Muneeb Ali"}
+
+    resp = jsonrpc.request('dht_get', key)
+    print resp
