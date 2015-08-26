@@ -22,21 +22,25 @@ This file is part of DHT-Mirror.
     along with DHT-Mirror. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import jsonrpc_ns
 import json
+from basicrpc import Proxy
 
 from config import DEFAULT_SERVER, DEFAULT_PORT, DEBUG
 
 
+def format_response(response):
+
+    response = response[0]
+    return json.dumps(response, sort_keys=True, indent=4, separators=(',', ': '))
+
 # ------------------------------
 if __name__ == '__main__':
 
-    from jsonrpc_ns import JSONRPCProxy
-    jsonrpc = JSONRPCProxy(DEFAULT_SERVER, DEFAULT_PORT)
-    resp = jsonrpc.request('ping')
-    print resp
+    c = Proxy(DEFAULT_SERVER, DEFAULT_PORT)
+    resp = c.ping()
+    print format_response(resp)
 
     key = {"name": "Muneeb Ali"}
 
-    resp = jsonrpc.request('dht_get', key)
-    print resp
+    resp = c.dht_get(key)
+    print format_response(resp)
