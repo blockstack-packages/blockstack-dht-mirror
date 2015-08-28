@@ -26,12 +26,12 @@ This file is part of DHT-Mirror.
 from txjsonrpc.netstring import jsonrpc
 from twisted.application import service, internet
 
-from server import DHTMirrorRPC
+from mirror.server import DHTMirrorRPC
 
 from kademlia.network import Server
 from blockstore.dht.storage import BlockStorage, hostname_to_ip
 
-from .config import DEFAULT_PORT, DHT_SERVER_PORT, DEFAULT_DHT_SERVERS
+from mirror.config import DEFAULT_PORT, DHT_SERVER_PORT, DEFAULT_DHT_SERVERS
 
 application = service.Application("dht-mirror")
 
