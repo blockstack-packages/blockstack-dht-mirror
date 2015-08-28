@@ -30,7 +30,11 @@ from config import DEFAULT_SERVER, DEFAULT_PORT, DEBUG
 
 def format_response(response):
 
-    response = response[0]
+    try:
+        response = response[0]
+    except:
+        pass
+
     return json.dumps(response, sort_keys=True, indent=4, separators=(',', ': '))
 
 # ------------------------------
@@ -40,7 +44,10 @@ if __name__ == '__main__':
     resp = c.ping()
     print format_response(resp)
 
+    resp = c.stats()
+    print format_response(resp)
+
     key = {"name": "Muneeb Ali"}
 
-    resp = c.dht_get(key)
-    print format_response(resp)
+    #resp = c.dht_get(key)
+    #print format_response(resp)

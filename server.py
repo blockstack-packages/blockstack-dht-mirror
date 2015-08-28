@@ -40,7 +40,7 @@ class DHTMirrorRPC(jsonrpc.JSONRPC):
         reply['status'] = "alive"
         return reply
 
-    def jsonrpc_stats(self, sentence):
+    def jsonrpc_stats(self):
         stats = {}
         return stats
 
@@ -81,6 +81,8 @@ class DHTMirrorRPC(jsonrpc.JSONRPC):
         return resp
 
     def jsonrpc_dht_set(self, key, value):
+
+        print "got here"
 
         resp = {}
 
