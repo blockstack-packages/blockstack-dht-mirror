@@ -11,3 +11,7 @@ current version requires a modified fork of jsonrpc-ns which can be installed by
 > pip install git+https://github.com/muneeb-ali/jsonrpc-ns.git
 
 WARNING: This repo is under active development.
+
+To start the mirror server:
+
+> twistd -noy mirror/server.tac
