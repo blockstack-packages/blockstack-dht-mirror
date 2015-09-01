@@ -23,10 +23,9 @@ This file is part of DHT-Mirror.
 """
 
 
-from txjsonrpc.netstring import jsonrpc
 from twisted.application import service, internet
 
-from mirror.server import DHTMirrorRPC
+from mirror.server import DHTMirrorRPC, RPCFactory
 
 from kademlia.network import Server
 from blockstore.dht.storage import BlockStorage, hostname_to_ip
@@ -40,7 +39,7 @@ dht_server = Server(storage=BlockStorage())
 bootstrap_servers = hostname_to_ip(DEFAULT_DHT_SERVERS)
 dht_server.bootstrap(bootstrap_servers)
 
-factory_dhtmirror = jsonrpc.RPCFactory(DHTMirrorRPC(dht_server))
+factory_dhtmirror = RPCFactory(DHTMirrorRPC(dht_server))
 
 server_dhtmirror = internet.TCPServer(DEFAULT_PORT, factory_dhtmirror)
 server_dhtmirror.setServiceParent(application)
