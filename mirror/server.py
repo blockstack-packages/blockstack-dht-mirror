@@ -31,8 +31,6 @@ from pymongo import MongoClient
 db = MongoClient()
 dht_mirror = db.dht_mirror
 
-MAX_LENGTH = 2048
-
 
 class DHTMirrorRPC(jsonrpc.JSONRPC):
     """ A DHT Mirror with faster get/set."""
@@ -105,29 +103,3 @@ class DHTMirrorRPC(jsonrpc.JSONRPC):
             resp['error'] = e
 
         return resp
-
-
-class RPCFactory(protocol.ServerFactory):
-
-    protocol = None
-
-    def __init__(self, rpcClass, maxLength=MAX_LENGTH):
-        self.maxLength = maxLength
-        self.protocol = rpcClass
-        self.subHandlers = {}
-
-    def buildProtocol(self, addr):
-        p = protocol.ServerFactory.buildProtocol(self, addr)
-        for key, val in self.subHandlers.items():
-            klass, args, kws = val
-            if args and args[0] == 'protocol':
-                p.putSubHandler(key, klass(p))
-            else:
-                p.putSubHandler(key, klass(*args, **kws))
-        return p
-
-    def putSubHandler(self, name, klass, args=(), kws={}):
-        self.subHandlers[name] = (klass, args, kws)
-
-    def addIntrospection(self):
-        self.putSubHandler('system', Introspection, ('protocol',))
