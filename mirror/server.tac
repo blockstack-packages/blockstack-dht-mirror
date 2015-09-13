@@ -31,9 +31,9 @@ from mirror.server import DHTMirrorRPC
 from kademlia.network import Server
 from blockstore.dht.storage import BlockStorage, hostname_to_ip
 
-from mirror.config import DEFAULT_PORT, DHT_SERVER_PORT, DEFAULT_DHT_SERVERS
-
-MAX_LENGTH = 2048
+from mirror.config import DEFAULT_DHT_SERVERS
+from mirror.config import DHT_UDP_PORT, MIRROR_TCP_PORT
+from mirror.config import MAX_LENGTH
 
 application = service.Application("dht-mirror")
 
@@ -44,9 +44,9 @@ dht_server.bootstrap(bootstrap_servers)
 
 factory_dhtmirror = jsonrpc.RPCFactory(DHTMirrorRPC(dht_server), maxLength=MAX_LENGTH)
 
-server_dhtmirror = internet.TCPServer(DEFAULT_PORT, factory_dhtmirror)
+server_dhtmirror = internet.TCPServer(MIRROR_TCP_PORT, factory_dhtmirror)
 server_dhtmirror.setServiceParent(application)
 
 
-server_dht = internet.UDPServer(DHT_SERVER_PORT, dht_server.protocol)
+server_dht = internet.UDPServer(DHT_UDP_PORT, dht_server.protocol)
 server_dht.setServiceParent(application)

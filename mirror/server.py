@@ -22,18 +22,33 @@ This file is part of DHT-Mirror.
     along with DHT-Mirror. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
 from txjsonrpc.netstring import jsonrpc
 from kademlia.log import Logger
 
 from twisted.internet import protocol
+from pybitcoin import hex_hash160
+from threading import Thread
 
 from pymongo import MongoClient
-db = MongoClient()
+c = MongoClient()
+db = c['dht-mirror']
 dht_mirror = db.dht_mirror
 
 
 class DHTMirrorRPC(jsonrpc.JSONRPC):
     """ A DHT Mirror with faster get/set."""
+
+    def _get_hash(self, value):
+
+        if type(value) is not dict:
+            try:
+                #self.log.info("WARNING: converting to json")
+                value = json.loads(value)
+            except:
+                self.log.info("WARNING: not valid json")
+
+        return hex_hash160(json.dumps(value, sort_keys=True))
 
     def __init__(self, dht_server=None):
         self.dht_server = dht_server
@@ -47,40 +62,63 @@ class DHTMirrorRPC(jsonrpc.JSONRPC):
 
     def jsonrpc_stats(self):
         stats = {}
+        stats['entries'] = dht_mirror.count()
         return stats
 
     def jsonrpc_get(self, key):
 
-        self.log.info("got a get request")
+        resp = {}
+        resp['key'] = key
+
+        self.log.info("Get request for key: %s" % key)
 
         entry = dht_mirror.find_one({"key": key})
 
         if entry is not None:
-            return entry['value']
+            resp['value'] = entry['value']
         else:
-            return None
+            # if not in mirror/cache get from DHT
+            return self.jsonrpc_dht_get(key)
+
+        return resp
 
     def jsonrpc_set(self, key, value):
 
-        self.log.info("got a set request")
+        self.log.info("Set request for key: %s" % key)
 
-        return True
+        resp = {}
+
+        test_hash = self._get_hash(value)
+
+        if test_hash != key:
+            resp['error'] = "hash(value) doesn't match key"
+            return resp
 
         new_entry = {}
         new_entry['key'] = key
         new_entry['value'] = value
 
-        entry = dht_mirror.find_one({"key": key})
+        try:
+            entry = dht_mirror.find_one({"key": key})
+        except:
+            self.log.info("error on %s" % kry)
 
-        if entry is not None:
+        if entry is None:
+            self.log.info("Writing new entry %s" % key)
             dht_mirror.insert(new_entry)
         else:
-            entry['value'] = value
-            dht_mirror.save(entry)
+            self.log.info("Entry already in mirror")
 
-        return True
+        # perform the dht set/refresh in the background
+        self.jsonrpc_dht_set(key, value)
+
+        resp['status'] = 'success'
+
+        return resp
 
     def jsonrpc_dht_get(self, key):
+
+        self.log.info("DHT get request for key: %s" % key)
 
         resp = {}
 
@@ -93,7 +131,7 @@ class DHTMirrorRPC(jsonrpc.JSONRPC):
 
     def jsonrpc_dht_set(self, key, value):
 
-        print "got here"
+        self.log.info("DHT set request for key: %s" % key)
 
         resp = {}
 
