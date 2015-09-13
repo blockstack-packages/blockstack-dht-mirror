@@ -22,12 +22,15 @@ This file is part of DHT-Mirror.
 
 DEBUG = True
 
-DEFAULT_PORT = 5005
 DEFAULT_SERVER = '127.0.0.1'
 
-DHT_SERVER_PORT = 6265  # blockstored default to port 6264
+DHT_UDP_PORT = 6265  # blockstored defaults to port 6264
+MIRROR_TCP_PORT = 6266
 
-DEFAULT_DHT_SERVERS = [('dht.openname.org', DHT_SERVER_PORT),
-                       ('dht.onename.com', DHT_SERVER_PORT),
-                       ('dht.halfmoonlabs.com', DHT_SERVER_PORT),
-                       ('127.0.0.1', DHT_SERVER_PORT)]
+DEFAULT_DHT_SERVERS = [('dht.blockstack.org', DHT_UDP_PORT),
+                       ('dht.onename.com', DHT_UDP_PORT),
+                       ('dht.halfmoonlabs.com', DHT_UDP_PORT),
+                       ('127.0.0.1', DHT_UDP_PORT)]
+
+# see rpcudp/protocol.py
+MAX_LENGTH = 8 * 1024
