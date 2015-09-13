@@ -6,13 +6,15 @@ from time import sleep
 from pymongo import MongoClient
 
 from basicrpc import Proxy
-from pybitcoin import hex_hash160
 
-from mirror.config import DEFAULT_SERVER, DEFAULT_PORT, DEBUG
+from mirror.config import DEFAULT_SERVER, MIRROR_TCP_PORT, DEBUG
 
+CACHE_FILENAME = 'btc_state_v1.json'
+
+from pymongo import MongoClient
 c = MongoClient()
-namespace_db = c['namespace']
-btc_state = namespace_db.btc_state
+db = c['dht-mirror']
+dht_mirror = db.dht_mirror
 
 
 def pretty_print(data):
@@ -26,72 +28,45 @@ def pretty_print(data):
         try:
             data = json.loads(data)
         except Exception as e:
+            print "got here"
             print e
 
-    return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+    print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-def get_hash(profile):
-
-    if type(profile) is not dict:
-        try:
-            print "WARNING: converting to json"
-            profile = json.loads(profile)
-        except:
-            print "WARNING: not valid json"
-
-    return hex_hash160(json.dumps(profile, sort_keys=True))
-
-# ------------------------------
-if __name__ == '__main__':
-
-    c = Proxy(DEFAULT_SERVER, DEFAULT_PORT)
-    resp = c.ping()
-    print pretty_print(resp)
-
-    error_usernames = ['surzayonghosh', 'captaincalliope']
-
-    write_usernames = ['judecn', 'ryan']
-
-    counter = 0
-
-    resp = c.dht_get('dbbdedc2b81d875403cc76486625a19f1e3b3c6f')
-    print resp[0]
-
-    fin = open('btc_state_v1.json', 'r')
+def warmup_mirror():
+    fin = open(CACHE_FILENAME, 'r')
 
     data = fin.read()
     data = json.loads(data)
 
+    counter = 0
+
+    error_usernames = ['surzayonghosh', 'captaincalliope']
+
+    checked_names = []
+
     for entry in data:
-    #for entry in btc_state.find(timeout=False):
 
         if entry['username'] in error_usernames:
             continue
-
-        #if entry['username'] not in write_usernames:
-        #    continue
 
         print entry['username']
         key = entry['profile_hash']
         value = json.dumps(entry['profile'], sort_keys=True)
 
-        #resp = c.dht_get(key)
-
-        #print resp[0]
-
+        #resp = c.get(key)
+        #pretty_print(resp)
         #continue
 
         try:
-            resp = c.dht_set(key, value)
-            resp = resp[0]
-
-            print entry['username']
-            print resp
+            resp = c.set(key, value)
+            pretty_print(resp)
             counter += 1
             print counter
             print '-' * 5
-        except:
+        except Exception as e:
+            print e
             print "problem %s" % entry['username']
             print key
             print value
@@ -101,29 +76,10 @@ if __name__ == '__main__':
         #    print"trying set"
         #    print c.dht_set(key, value)
 
-        """
+# ------------------------------
+if __name__ == '__main__':
 
-        #print "username: " + username
-
-        try:
-            temp = "profile:" + resp
-        except Exception as e:
-            print resp
-
-        continue
-
-        print "hash of profile (namecoin): " + profile_hash
-        print "hash of profile (DHT): " + hex_hash160(resp)
-
-        if hex_hash160(resp) != profile_hash:
-            print profile_hash
-            print hex_hash160(resp)
-        else:
-            print "match"
-
-        print "-" * 5
-
-        #resp = c.dht_get(profile_hash)
-        #if pretty_print(resp) == "null":
-        #    print username
-        """
+    c = Proxy(DEFAULT_SERVER, MIRROR_TCP_PORT)
+    pretty_print(c.ping())
+    pretty_print(c.stats())
+    warmup_mirror()
