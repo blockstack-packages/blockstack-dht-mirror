@@ -11,3 +11,15 @@ WARNING: This repo is under active development.
 To start the mirror server:
 
 > twistd -noy mirror/server.tac
+
+# Installation
+
+On a fresh Debian / Ubuntu server:
+
+> sudo apt-get update
+> sudo apt-get install python-pip
+> sudo apt-get install python-dev
+> sudo apt-get install mongodb
+> git clone https://github.com/blockstack/dht-mirror.git
+> cd dht-mirror
+> sudo pip install -r requirements.txt
