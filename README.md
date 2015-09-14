@@ -16,10 +16,12 @@ To start the mirror server:
 
 On a fresh Debian / Ubuntu server:
 
-> sudo apt-get update
-> sudo apt-get install python-pip
-> sudo apt-get install python-dev
-> sudo apt-get install mongodb
-> git clone https://github.com/blockstack/dht-mirror.git
-> cd dht-mirror
-> sudo pip install -r requirements.txt
+```
+sudo apt-get update
+sudo apt-get install python-pip
+sudo apt-get install python-dev
+sudo apt-get install mongodb
+git clone https://github.com/blockstack/dht-mirror.git
+cd dht-mirror
+sudo pip install -r requirements.txt
+```
