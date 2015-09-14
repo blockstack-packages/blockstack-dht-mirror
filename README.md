@@ -18,9 +18,7 @@ On a fresh Debian / Ubuntu server:
 
 ```
 sudo apt-get update
-sudo apt-get install python-pip
-sudo apt-get install python-dev
-sudo apt-get install mongodb
+sudo apt-get install -y python-pip python-dev mongodb
 git clone https://github.com/blockstack/dht-mirror.git
 cd dht-mirror
 sudo pip install -r requirements.txt
