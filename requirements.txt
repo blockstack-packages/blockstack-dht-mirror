@@ -1,4 +1,4 @@
-basicrpc==0.0.1
+basicrpc==0.0.2
 blockstore==0.0.3
 coinkit==0.7.8
 commontools==0.1.0
