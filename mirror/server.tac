@@ -40,7 +40,6 @@ application = service.Application("dht-mirror")
 # now setup the kademlia node
 dht_server = Server(storage=BlockStorage())
 bootstrap_servers = hostname_to_ip(DEFAULT_DHT_SERVERS)
-bootstrap_servers = ['52.20.98.85']
 dht_server.bootstrap(bootstrap_servers)
 
 factory_dhtmirror = jsonrpc.RPCFactory(DHTMirrorRPC(dht_server), maxLength=MAX_LENGTH)
