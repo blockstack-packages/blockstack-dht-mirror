@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
     DHT-Mirror
     ~~~~~
@@ -20,19 +22,21 @@ This file is part of DHT-Mirror.
     along with DHT-Mirror. If not, see <http://www.gnu.org/licenses/>.
 """
 
-DEBUG = True
+import json
 
-DEFAULT_SERVER = '127.0.0.1'
 
-DHT_UDP_PORT = 6265  # blockstored defaults to port 6264
-MIRROR_TCP_PORT = 6266
+def pretty_print(data):
 
-DEFAULT_DHT_SERVERS = [('dht.blockstack.org', DHT_UDP_PORT),
-                       ('dht.onename.com', DHT_UDP_PORT),
-                       ('dht.halfmoonlabs.com', DHT_UDP_PORT),
-                       ('127.0.0.1', DHT_UDP_PORT)]
+    try:
+        data = data[0]
+    except:
+        pass
 
-# see rpcudp/protocol.py
-MAX_LENGTH = 8 * 1024
+    if type(data) is not dict:
+        try:
+            data = json.loads(data)
+        except Exception as e:
+            print "got here"
+            print e
 
-DHT_STATE_FILE = 'data/dht_state.json'
+    print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))

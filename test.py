@@ -55,9 +55,9 @@ def warmup_mirror():
         key = entry['profile_hash']
         value = json.dumps(entry['profile'], sort_keys=True)
 
-        #resp = c.get(key)
-        #pretty_print(resp)
-        #continue
+        resp = c.get(key)
+        pretty_print(resp)
+        continue
 
         try:
             resp = c.set(key, value)
@@ -79,7 +79,12 @@ def warmup_mirror():
 # ------------------------------
 if __name__ == '__main__':
 
-    c = Proxy(DEFAULT_SERVER, MIRROR_TCP_PORT)
+    test_hash = "3b04c220530154898d02463fba83a235de184936"
+
+    c = Proxy(DEFAULT_SERVER, MIRROR_TCP_PORT, timeout=30)
     pretty_print(c.ping())
-    pretty_print(c.stats())
-    warmup_mirror()
+    #pretty_print(c.stats())
+    result = c.dht_get(test_hash)
+    print result
+    #pretty_print(result)
+    #warmup_mirror()
