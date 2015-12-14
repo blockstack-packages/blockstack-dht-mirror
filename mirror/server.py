@@ -36,6 +36,24 @@ db = c['dht-mirror']
 dht_mirror = db.dht_mirror
 
 
+def write_to_cache(key, value):
+
+    new_entry = {}
+    new_entry['key'] = key
+    new_entry['value'] = value
+
+    try:
+        entry = dht_mirror.find_one({"key": key})
+    except:
+        self.log.info("Error on %s" % key)
+
+    if entry is None:
+        self.log.info("Writing new entry %s" % key)
+        dht_mirror.insert(new_entry)
+    else:
+        self.log.info("Entry already in mirror")
+
+
 class DHTMirrorRPC(jsonrpc.JSONRPC):
     """ A DHT Mirror with faster get/set."""
 
@@ -94,20 +112,7 @@ class DHTMirrorRPC(jsonrpc.JSONRPC):
             resp['error'] = "hash(value) doesn't match key"
             return resp
 
-        new_entry = {}
-        new_entry['key'] = key
-        new_entry['value'] = value
-
-        try:
-            entry = dht_mirror.find_one({"key": key})
-        except:
-            self.log.info("error on %s" % kry)
-
-        if entry is None:
-            self.log.info("Writing new entry %s" % key)
-            dht_mirror.insert(new_entry)
-        else:
-            self.log.info("Entry already in mirror")
+        write_to_cache(key, value)
 
         # perform the dht set/refresh in the background
         self.jsonrpc_dht_set(key, value)
@@ -124,6 +129,9 @@ class DHTMirrorRPC(jsonrpc.JSONRPC):
 
         try:
             resp = self.dht_server.get(key)
+            value = resp[0]
+            write_to_cache(key, value)
+
         except Exception as e:
             resp['error'] = e
 

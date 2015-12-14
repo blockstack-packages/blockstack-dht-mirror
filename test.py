@@ -81,6 +81,7 @@ if __name__ == '__main__':
 
     test_hash = "3b04c220530154898d02463fba83a235de184936"
 
+    DEFAULT_SERVER = '52.20.98.85'
     c = Proxy(DEFAULT_SERVER, MIRROR_TCP_PORT, timeout=30)
     pretty_print(c.ping())
     #pretty_print(c.stats())
